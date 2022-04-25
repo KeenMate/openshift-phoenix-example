@@ -75,6 +75,8 @@ USER "${USER}"
 # copy release executables
 COPY --from=build --chown="${USER}":"${USER}" /app/_build/"${MIX_ENV}"/rel/message_cave ./
 
+EXPOSE 4000
+
 ENTRYPOINT ["bin/message_cave"]
 
 CMD ["start"]
