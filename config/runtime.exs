@@ -13,18 +13,49 @@ if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
 end
 
 if config_env() == :prod do
-  database_url =
-    System.get_env("DATABASE_URL") ||
+  db_hostname_var =
+    System.get_env("DB_HOSTNAME") ||
       raise """
-      environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
+      environment variable DB_HOSTNAME is missing.
+      For example: MAIN_DB_SERVICE_SERVICE_HOST
+      """
+
+  db_hostname =
+    System.get_env(db_hostname_var) ||
+      raise """
+      environment variable #{db_hostname_var} is missing.
+      For example: MAIN_DB_SERVICE_SERVICE_HOST
+      """
+
+  db_username =
+    System.get_env("DB_USERNAME") ||
+      raise """
+      environment variable DB_USERNAME is missing.
+      For example: postgres
+      """
+
+  db_password =
+    System.get_env("DB_PASSWORD") ||
+      raise """
+      environment variable DB_PASSWORD is missing.
+      For example: Password3000!!
+      """
+
+  db_database =
+    System.get_env("DB_DATABASE") ||
+      raise """
+      environment variable DB_DATABASE is missing.
+      For example: hello-world-db
       """
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6"), do: [:inet6], else: []
 
   config :message_cave, MessageCave.Repo,
     # ssl: true,
-    url: database_url,
+    hostname: db_hostname,
+    username: db_username,
+    password: db_password,
+    database: db_database,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
 
